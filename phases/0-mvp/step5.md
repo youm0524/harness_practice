@@ -31,14 +31,19 @@ popup UI에서 현재 탭 자동 채우기를 실행하고 결과를 보여준�
 - 오류 상태 표시
 - options 페이지 열기 버튼
 - 프로필이 비어 있을 때 options 페이지로 유도하는 상태
+- 부분 성공 상태 표시
+- 자동 채우기 결과가 0건일 때의 no-match 상태
+- 제출 전 직접 확인 안내
 
 구현 지시:
 
 - popup은 `chrome.runtime`/`chrome.tabs` 메시지를 통해 background 또는 content script와 통신한다.
 - 자동 채우기 버튼은 사용자가 클릭했을 때만 메시지를 보낸다.
 - 결과 목록은 너무 길어지지 않게 주요 매칭 몇 개만 보여준다.
+- 대표 매칭 결과는 최대 5개만 보여준다.
 - UI는 `docs/UI_GUIDE.md`를 따르고 popup 너비에 맞게 텍스트가 넘치지 않게 한다.
 - 적절한 lucide-react 아이콘을 사용한다.
+- 오류 문구는 사용자가 다음에 할 수 있는 행동을 포함해야 한다.
 
 ## Acceptance Criteria
 
@@ -54,6 +59,7 @@ npm run test
 2. 아키텍처 체크리스트를 확인한다:
    - popup에서 사용자가 클릭하기 전 자동 채우기 메시지를 보내지 않는가?
    - 성공/실패/빈 프로필 상태가 모두 표현되는가?
+   - partial/no-match 상태가 오류와 구분되어 표현되는가?
    - popup 텍스트와 버튼이 좁은 화면에서 넘치지 않는가?
 3. 결과에 따라 `phases/0-mvp/index.json`의 해당 step을 업데이트한다:
    - 성공 -> `"status": "completed"`, `"summary": "자동 채우기 실행 popup UI와 결과/오류/빈 프로필 상태 구현"`
