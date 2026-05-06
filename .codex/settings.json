@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -Command \"npm.cmd run lint; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; npm.cmd run test:unit; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; npm.cmd run test:ui; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; npm.cmd run build; exit $LASTEXITCODE\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -c \"import os,re,sys; tool_input=(os.environ.get('CLAUDE_TOOL_INPUT') or os.environ.get('CODEX_TOOL_INPUT') or '').lower(); patterns=[r'rm\\\\s+-rf', r'git\\\\s+push\\\\s+--force', r'git\\\\s+reset\\\\s+--hard', r'drop\\\\s+table']; blocked=any(re.search(p, tool_input) for p in patterns); sys.stderr.write('BLOCKED: 위험한 명령이 감지되었습니다.\\\\n') if blocked else None; sys.exit(1 if blocked else 0)\""
+          }
+        ]
+      }
+    ]
+  }
+}
