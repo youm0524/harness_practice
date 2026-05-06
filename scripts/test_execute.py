@@ -441,12 +441,10 @@ class TestInvokeCodex:
             output = executor._invoke_codex(step, preamble)
 
         cmd = mock_run.call_args[0][0]
-        assert cmd[:2] == ["codex", "exec"]
+        assert cmd[:4] == ["codex", "--ask-for-approval", "never", "exec"]
         assert "--cd" in cmd
         assert "--sandbox" in cmd
         assert "workspace-write" in cmd
-        assert "--ask-for-approval" in cmd
-        assert "never" in cmd
         assert "--json" in cmd
         assert cmd[-1] == "-"
         assert mock_run.call_args[1]["input"].startswith("PREAMBLE")
