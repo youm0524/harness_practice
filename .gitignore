@@ -1,8 +1,14 @@
 node_modules/
+dist/
 .next/
 out/
 next-env.d.ts
 tsconfig.tsbuildinfo
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+vitest.config.js
+vitest.config.d.ts
 
 # phase execution outputs
 phases/**/phase*-output.json
