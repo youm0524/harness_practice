@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "ApplyMate",
+  "description": "브라우저 로컬에 저장한 지원서 기본 정보를 사용자가 요청할 때 현재 페이지에 입력합니다.",
+  "version": "0.0.0",
+  "action": {
+    "default_popup": "src/popup/index.html",
+    "default_title": "ApplyMate"
+  },
+  "options_ui": {
+    "page": "src/options/index.html",
+    "open_in_tab": true
+  },
+  "background": {
+    "service_worker": "assets/background.js",
+    "type": "module"
+  },
+  "permissions": ["storage", "activeTab", "scripting"]
+}
