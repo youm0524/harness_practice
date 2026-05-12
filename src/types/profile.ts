@@ -1,39 +1,56 @@
-export type PersonalInfo = {
+export interface PersonalInfo {
   name: string;
   birthDate: string;
   email: string;
   phone: string;
   address: string;
-};
+}
 
-export type Education = {
+export interface Education {
   schoolName: string;
   major: string;
   degree: string;
   startDate: string;
   endDate: string;
   gpa: string;
-};
+}
 
-export type Credential = {
+export interface Credential {
   name: string;
   acquiredDate: string;
   issuer: string;
-};
+}
 
-export type ProjectExperience = {
+export interface ActivityProject {
   title: string;
   startDate: string;
   endDate: string;
   role: string;
   description: string;
   techStack: string;
-};
+}
 
-export type UserProfile = {
+export interface WorkExperience {
+  company: string;
+  position: string;
+  startDate: string;
+  endDate: string;
+  description: string;
+}
+
+export interface Award {
+  name: string;
+  awardDate: string;
+  issuer: string;
+  description: string;
+}
+
+export interface UserProfile {
   personal: PersonalInfo;
-  education: Education[];
+  educations: Education[];
   credentials: Credential[];
-  projects: ProjectExperience[];
+  extracurricularProjects: ActivityProject[];
+  workExperiences: WorkExperience[];
+  awards: Award[];
   updatedAt: string | null;
-};
+}

@@ -10,6 +10,10 @@ export type FieldCandidate = {
   placeholder: string;
   ariaLabel: string;
   nearbyText: string;
+  sectionText: string;
+  autocomplete: string;
+  inputMode: string;
+  maxLength: number;
   disabled: boolean;
   readonly: boolean;
   hidden: boolean;
@@ -20,10 +24,17 @@ export type FieldMatch = {
   profileField: string;
   label: string;
   confidence: number;
+  reviewRequired: boolean;
+  value: string;
 };
 
 export type AutofillPlan = {
   matches: FieldMatch[];
+};
+
+export type AutofillAnalysis = {
+  candidatesCount: number;
+  plan: AutofillPlan;
 };
 
 export type AutofillResult = {
