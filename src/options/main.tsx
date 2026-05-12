@@ -2,14 +2,20 @@ import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { AlertTriangle, Plus, RotateCcw, Save, Trash2 } from "lucide-react";
 import { Button } from "../components/Button";
-import { clearProfile, createEmptyProfile, getProfile, saveProfile } from "../lib/storage";
+import {
+  clearProfile,
+  createEmptyProfile,
+  getProfile,
+  saveProfile,
+} from "../lib/storage";
 import type {
   ActivityProject,
   Award,
   Credential,
   Education,
+  LanguageScore,
   UserProfile,
-  WorkExperience
+  WorkExperience,
 } from "../types/profile";
 import "../styles.css";
 
@@ -26,7 +32,7 @@ function TextField({
   label,
   value,
   onChange,
-  multiline = false
+  multiline = false,
 }: {
   label: string;
   value: string;
@@ -35,7 +41,10 @@ function TextField({
 }) {
   const id = label.replace(/\s+/g, "-");
   return (
-    <label className="flex flex-col gap-1 text-sm font-medium text-[#374239]" htmlFor={id}>
+    <label
+      className="flex flex-col gap-1 text-sm font-medium text-[#374239]"
+      htmlFor={id}
+    >
       {label}
       {multiline ? (
         <textarea
@@ -59,7 +68,7 @@ function TextField({
 function Section({
   title,
   children,
-  action
+  action,
 }: {
   title: string;
   children: React.ReactNode;
@@ -88,21 +97,35 @@ function OptionsApp() {
   function updatePersonal(field: keyof UserProfile["personal"], value: string) {
     setProfile((current) => ({
       ...current,
-      personal: { ...current.personal, [field]: value }
+      personal: { ...current.personal, [field]: value },
     }));
   }
 
-  function updateList<T extends Education | Credential | ActivityProject | WorkExperience | Award>(
-    key: "educations" | "credentials" | "extracurricularProjects" | "workExperiences" | "awards",
+  function updateList<
+    T extends
+      | Education
+      | Credential
+      | LanguageScore
+      | ActivityProject
+      | WorkExperience
+      | Award,
+  >(
+    key:
+      | "educations"
+      | "credentials"
+      | "languageScores"
+      | "extracurricularProjects"
+      | "workExperiences"
+      | "awards",
     index: number,
     field: keyof T,
-    value: string
+    value: string,
   ) {
     setProfile((current) => ({
       ...current,
       [key]: current[key].map((item, itemIndex) =>
-        itemIndex === index ? { ...item, [field]: value } : item
-      )
+        itemIndex === index ? { ...item, [field]: value } : item,
+      ),
     }));
   }
 
@@ -113,7 +136,10 @@ function OptionsApp() {
       setProfile(saved);
       setStatus({ type: "success", message: "프로필을 저장했습니다." });
     } catch {
-      setStatus({ type: "error", message: "저장하지 못했습니다. 잠시 뒤 다시 시도하세요." });
+      setStatus({
+        type: "error",
+        message: "저장하지 못했습니다. 잠시 뒤 다시 시도하세요.",
+      });
     }
   }
 
@@ -124,7 +150,10 @@ function OptionsApp() {
       setConfirmReset(false);
       setStatus({ type: "success", message: "로컬 프로필을 초기화했습니다." });
     } catch {
-      setStatus({ type: "error", message: "초기화하지 못했습니다. 다시 시도하세요." });
+      setStatus({
+        type: "error",
+        message: "초기화하지 못했습니다. 다시 시도하세요.",
+      });
     }
   }
 
@@ -153,12 +182,32 @@ function OptionsApp() {
 
         <Section title="인적사항">
           <div className="grid gap-4 md:grid-cols-2">
-            <TextField label="이름" value={profile.personal.name} onChange={(value) => updatePersonal("name", value)} />
-            <TextField label="생년월일" value={profile.personal.birthDate} onChange={(value) => updatePersonal("birthDate", value)} />
-            <TextField label="이메일" value={profile.personal.email} onChange={(value) => updatePersonal("email", value)} />
-            <TextField label="전화번호" value={profile.personal.phone} onChange={(value) => updatePersonal("phone", value)} />
+            <TextField
+              label="이름"
+              value={profile.personal.name}
+              onChange={(value) => updatePersonal("name", value)}
+            />
+            <TextField
+              label="생년월일"
+              value={profile.personal.birthDate}
+              onChange={(value) => updatePersonal("birthDate", value)}
+            />
+            <TextField
+              label="이메일"
+              value={profile.personal.email}
+              onChange={(value) => updatePersonal("email", value)}
+            />
+            <TextField
+              label="전화번호"
+              value={profile.personal.phone}
+              onChange={(value) => updatePersonal("phone", value)}
+            />
             <div className="md:col-span-2">
-              <TextField label="주소" value={profile.personal.address} onChange={(value) => updatePersonal("address", value)} />
+              <TextField
+                label="주소"
+                value={profile.personal.address}
+                onChange={(value) => updatePersonal("address", value)}
+              />
             </div>
           </div>
         </Section>
@@ -173,8 +222,15 @@ function OptionsApp() {
                   ...current,
                   educations: [
                     ...current.educations,
-                    { schoolName: "", major: "", degree: "", startDate: "", endDate: "", gpa: "" }
-                  ]
+                    {
+                      schoolName: "",
+                      major: "",
+                      degree: "",
+                      startDate: "",
+                      endDate: "",
+                      gpa: "",
+                    },
+                  ],
                 }))
               }
             >
@@ -185,16 +241,23 @@ function OptionsApp() {
         >
           <div className="space-y-5">
             {profile.educations.map((education, index) => (
-              <div className="border-t border-[#d8ded2] pt-4 first:border-t-0 first:pt-0" key={index}>
+              <div
+                className="border-t border-[#d8ded2] pt-4 first:border-t-0 first:pt-0"
+                key={index}
+              >
                 <div className="mb-3 flex items-center justify-between">
-                  <p className="text-sm font-semibold">{education.schoolName || "새 학력"}</p>
+                  <p className="text-sm font-semibold">
+                    {education.schoolName || "새 학력"}
+                  </p>
                   <Button
                     aria-label="학력 삭제"
                     variant="text"
                     onClick={() =>
                       setProfile((current) => ({
                         ...current,
-                        educations: current.educations.filter((_, itemIndex) => itemIndex !== index)
+                        educations: current.educations.filter(
+                          (_, itemIndex) => itemIndex !== index,
+                        ),
                       }))
                     }
                   >
@@ -203,12 +266,68 @@ function OptionsApp() {
                   </Button>
                 </div>
                 <div className="grid gap-4 md:grid-cols-3">
-                  <TextField label={`학교명 ${index + 1}`} value={education.schoolName} onChange={(value) => updateList<Education>("educations", index, "schoolName", value)} />
-                  <TextField label={`전공 ${index + 1}`} value={education.major} onChange={(value) => updateList<Education>("educations", index, "major", value)} />
-                  <TextField label={`학위 ${index + 1}`} value={education.degree} onChange={(value) => updateList<Education>("educations", index, "degree", value)} />
-                  <TextField label={`입학일 ${index + 1}`} value={education.startDate} onChange={(value) => updateList<Education>("educations", index, "startDate", value)} />
-                  <TextField label={`졸업일 ${index + 1}`} value={education.endDate} onChange={(value) => updateList<Education>("educations", index, "endDate", value)} />
-                  <TextField label={`학점 ${index + 1}`} value={education.gpa} onChange={(value) => updateList<Education>("educations", index, "gpa", value)} />
+                  <TextField
+                    label={`학교명 ${index + 1}`}
+                    value={education.schoolName}
+                    onChange={(value) =>
+                      updateList<Education>(
+                        "educations",
+                        index,
+                        "schoolName",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`전공 ${index + 1}`}
+                    value={education.major}
+                    onChange={(value) =>
+                      updateList<Education>("educations", index, "major", value)
+                    }
+                  />
+                  <TextField
+                    label={`학위 ${index + 1}`}
+                    value={education.degree}
+                    onChange={(value) =>
+                      updateList<Education>(
+                        "educations",
+                        index,
+                        "degree",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`입학일 ${index + 1}`}
+                    value={education.startDate}
+                    onChange={(value) =>
+                      updateList<Education>(
+                        "educations",
+                        index,
+                        "startDate",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`졸업일 ${index + 1}`}
+                    value={education.endDate}
+                    onChange={(value) =>
+                      updateList<Education>(
+                        "educations",
+                        index,
+                        "endDate",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`학점 ${index + 1}`}
+                    value={education.gpa}
+                    onChange={(value) =>
+                      updateList<Education>("educations", index, "gpa", value)
+                    }
+                  />
                 </div>
               </div>
             ))}
@@ -223,7 +342,10 @@ function OptionsApp() {
               onClick={() =>
                 setProfile((current) => ({
                   ...current,
-                  credentials: [...current.credentials, { name: "", acquiredDate: "", issuer: "" }]
+                  credentials: [
+                    ...current.credentials,
+                    { name: "", acquiredDate: "", issuer: "" },
+                  ],
                 }))
               }
             >
@@ -234,16 +356,23 @@ function OptionsApp() {
         >
           <div className="space-y-5">
             {profile.credentials.map((credential, index) => (
-              <div className="border-t border-[#d8ded2] pt-4 first:border-t-0 first:pt-0" key={index}>
+              <div
+                className="border-t border-[#d8ded2] pt-4 first:border-t-0 first:pt-0"
+                key={index}
+              >
                 <div className="mb-3 flex items-center justify-between">
-                  <p className="text-sm font-semibold">{credential.name || "새 자격사항"}</p>
+                  <p className="text-sm font-semibold">
+                    {credential.name || "새 자격사항"}
+                  </p>
                   <Button
                     aria-label="자격사항 삭제"
                     variant="text"
                     onClick={() =>
                       setProfile((current) => ({
                         ...current,
-                        credentials: current.credentials.filter((_, itemIndex) => itemIndex !== index)
+                        credentials: current.credentials.filter(
+                          (_, itemIndex) => itemIndex !== index,
+                        ),
                       }))
                     }
                   >
@@ -252,9 +381,143 @@ function OptionsApp() {
                   </Button>
                 </div>
                 <div className="grid gap-4 md:grid-cols-3">
-                  <TextField label={`자격증명 ${index + 1}`} value={credential.name} onChange={(value) => updateList<Credential>("credentials", index, "name", value)} />
-                  <TextField label={`취득일 ${index + 1}`} value={credential.acquiredDate} onChange={(value) => updateList<Credential>("credentials", index, "acquiredDate", value)} />
-                  <TextField label={`발급처 ${index + 1}`} value={credential.issuer} onChange={(value) => updateList<Credential>("credentials", index, "issuer", value)} />
+                  <TextField
+                    label={`자격증명 ${index + 1}`}
+                    value={credential.name}
+                    onChange={(value) =>
+                      updateList<Credential>(
+                        "credentials",
+                        index,
+                        "name",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`취득일 ${index + 1}`}
+                    value={credential.acquiredDate}
+                    onChange={(value) =>
+                      updateList<Credential>(
+                        "credentials",
+                        index,
+                        "acquiredDate",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`발급처 ${index + 1}`}
+                    value={credential.issuer}
+                    onChange={(value) =>
+                      updateList<Credential>(
+                        "credentials",
+                        index,
+                        "issuer",
+                        value,
+                      )
+                    }
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </Section>
+
+        <Section
+          title="어학"
+          action={
+            <Button
+              variant="secondary"
+              onClick={() =>
+                setProfile((current) => ({
+                  ...current,
+                  languageScores: [
+                    ...current.languageScores,
+                    { language: "", testName: "", score: "", acquiredDate: "" },
+                  ],
+                }))
+              }
+            >
+              <Plus aria-hidden="true" className="h-4 w-4" />
+              항목 추가
+            </Button>
+          }
+        >
+          <div className="space-y-5">
+            {profile.languageScores.map((languageScore, index) => (
+              <div
+                className="border-t border-[#d8ded2] pt-4 first:border-t-0 first:pt-0"
+                key={index}
+              >
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-sm font-semibold">
+                    {languageScore.testName || "새 어학"}
+                  </p>
+                  <Button
+                    aria-label="어학 삭제"
+                    variant="text"
+                    onClick={() =>
+                      setProfile((current) => ({
+                        ...current,
+                        languageScores: current.languageScores.filter(
+                          (_, itemIndex) => itemIndex !== index,
+                        ),
+                      }))
+                    }
+                  >
+                    <Trash2 aria-hidden="true" className="h-4 w-4" />
+                    삭제
+                  </Button>
+                </div>
+                <div className="grid gap-4 md:grid-cols-4">
+                  <TextField
+                    label={`언어 ${index + 1}`}
+                    value={languageScore.language}
+                    onChange={(value) =>
+                      updateList<LanguageScore>(
+                        "languageScores",
+                        index,
+                        "language",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`시험명 ${index + 1}`}
+                    value={languageScore.testName}
+                    onChange={(value) =>
+                      updateList<LanguageScore>(
+                        "languageScores",
+                        index,
+                        "testName",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`점수/등급 ${index + 1}`}
+                    value={languageScore.score}
+                    onChange={(value) =>
+                      updateList<LanguageScore>(
+                        "languageScores",
+                        index,
+                        "score",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`취득일 ${index + 1}`}
+                    value={languageScore.acquiredDate}
+                    onChange={(value) =>
+                      updateList<LanguageScore>(
+                        "languageScores",
+                        index,
+                        "acquiredDate",
+                        value,
+                      )
+                    }
+                  />
                 </div>
               </div>
             ))}
@@ -271,8 +534,16 @@ function OptionsApp() {
                   ...current,
                   extracurricularProjects: [
                     ...current.extracurricularProjects,
-                    { title: "", startDate: "", endDate: "", role: "", description: "", techStack: "" }
-                  ]
+                    {
+                      title: "",
+                      organization: "",
+                      startDate: "",
+                      endDate: "",
+                      role: "",
+                      description: "",
+                      techStack: "",
+                    },
+                  ],
                 }))
               }
             >
@@ -283,16 +554,24 @@ function OptionsApp() {
         >
           <div className="space-y-5">
             {profile.extracurricularProjects.map((project, index) => (
-              <div className="border-t border-[#d8ded2] pt-4 first:border-t-0 first:pt-0" key={index}>
+              <div
+                className="border-t border-[#d8ded2] pt-4 first:border-t-0 first:pt-0"
+                key={index}
+              >
                 <div className="mb-3 flex items-center justify-between">
-                  <p className="text-sm font-semibold">{project.title || "새 대내외 프로젝트"}</p>
+                  <p className="text-sm font-semibold">
+                    {project.title || "새 대내외 프로젝트"}
+                  </p>
                   <Button
                     aria-label="대내외 프로젝트 삭제"
                     variant="text"
                     onClick={() =>
                       setProfile((current) => ({
                         ...current,
-                        extracurricularProjects: current.extracurricularProjects.filter((_, itemIndex) => itemIndex !== index)
+                        extracurricularProjects:
+                          current.extracurricularProjects.filter(
+                            (_, itemIndex) => itemIndex !== index,
+                          ),
                       }))
                     }
                   >
@@ -301,12 +580,91 @@ function OptionsApp() {
                   </Button>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <TextField label={`프로젝트명 ${index + 1}`} value={project.title} onChange={(value) => updateList<ActivityProject>("extracurricularProjects", index, "title", value)} />
-                  <TextField label={`역할 ${index + 1}`} value={project.role} onChange={(value) => updateList<ActivityProject>("extracurricularProjects", index, "role", value)} />
-                  <TextField label={`시작일 ${index + 1}`} value={project.startDate} onChange={(value) => updateList<ActivityProject>("extracurricularProjects", index, "startDate", value)} />
-                  <TextField label={`종료일 ${index + 1}`} value={project.endDate} onChange={(value) => updateList<ActivityProject>("extracurricularProjects", index, "endDate", value)} />
-                  <TextField label={`기술 스택 ${index + 1}`} value={project.techStack} onChange={(value) => updateList<ActivityProject>("extracurricularProjects", index, "techStack", value)} />
-                  <TextField label={`프로젝트 내용 ${index + 1}`} value={project.description} onChange={(value) => updateList<ActivityProject>("extracurricularProjects", index, "description", value)} multiline />
+                  <TextField
+                    label={`프로젝트명 ${index + 1}`}
+                    value={project.title}
+                    onChange={(value) =>
+                      updateList<ActivityProject>(
+                        "extracurricularProjects",
+                        index,
+                        "title",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`활동기관 ${index + 1}`}
+                    value={project.organization}
+                    onChange={(value) =>
+                      updateList<ActivityProject>(
+                        "extracurricularProjects",
+                        index,
+                        "organization",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`역할 ${index + 1}`}
+                    value={project.role}
+                    onChange={(value) =>
+                      updateList<ActivityProject>(
+                        "extracurricularProjects",
+                        index,
+                        "role",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`시작일 ${index + 1}`}
+                    value={project.startDate}
+                    onChange={(value) =>
+                      updateList<ActivityProject>(
+                        "extracurricularProjects",
+                        index,
+                        "startDate",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`종료일 ${index + 1}`}
+                    value={project.endDate}
+                    onChange={(value) =>
+                      updateList<ActivityProject>(
+                        "extracurricularProjects",
+                        index,
+                        "endDate",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`기술 스택 ${index + 1}`}
+                    value={project.techStack}
+                    onChange={(value) =>
+                      updateList<ActivityProject>(
+                        "extracurricularProjects",
+                        index,
+                        "techStack",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`프로젝트 내용 ${index + 1}`}
+                    value={project.description}
+                    onChange={(value) =>
+                      updateList<ActivityProject>(
+                        "extracurricularProjects",
+                        index,
+                        "description",
+                        value,
+                      )
+                    }
+                    multiline
+                  />
                 </div>
               </div>
             ))}
@@ -323,8 +681,14 @@ function OptionsApp() {
                   ...current,
                   workExperiences: [
                     ...current.workExperiences,
-                    { company: "", position: "", startDate: "", endDate: "", description: "" }
-                  ]
+                    {
+                      company: "",
+                      position: "",
+                      startDate: "",
+                      endDate: "",
+                      description: "",
+                    },
+                  ],
                 }))
               }
             >
@@ -335,16 +699,23 @@ function OptionsApp() {
         >
           <div className="space-y-5">
             {profile.workExperiences.map((experience, index) => (
-              <div className="border-t border-[#d8ded2] pt-4 first:border-t-0 first:pt-0" key={index}>
+              <div
+                className="border-t border-[#d8ded2] pt-4 first:border-t-0 first:pt-0"
+                key={index}
+              >
                 <div className="mb-3 flex items-center justify-between">
-                  <p className="text-sm font-semibold">{experience.company || "새 직장경력"}</p>
+                  <p className="text-sm font-semibold">
+                    {experience.company || "새 직장경력"}
+                  </p>
                   <Button
                     aria-label="직장경력 삭제"
                     variant="text"
                     onClick={() =>
                       setProfile((current) => ({
                         ...current,
-                        workExperiences: current.workExperiences.filter((_, itemIndex) => itemIndex !== index)
+                        workExperiences: current.workExperiences.filter(
+                          (_, itemIndex) => itemIndex !== index,
+                        ),
                       }))
                     }
                   >
@@ -353,12 +724,68 @@ function OptionsApp() {
                   </Button>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <TextField label={`회사명 ${index + 1}`} value={experience.company} onChange={(value) => updateList<WorkExperience>("workExperiences", index, "company", value)} />
-                  <TextField label={`직무/직위 ${index + 1}`} value={experience.position} onChange={(value) => updateList<WorkExperience>("workExperiences", index, "position", value)} />
-                  <TextField label={`입사일 ${index + 1}`} value={experience.startDate} onChange={(value) => updateList<WorkExperience>("workExperiences", index, "startDate", value)} />
-                  <TextField label={`퇴사일 ${index + 1}`} value={experience.endDate} onChange={(value) => updateList<WorkExperience>("workExperiences", index, "endDate", value)} />
+                  <TextField
+                    label={`회사명 ${index + 1}`}
+                    value={experience.company}
+                    onChange={(value) =>
+                      updateList<WorkExperience>(
+                        "workExperiences",
+                        index,
+                        "company",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`직무/직위 ${index + 1}`}
+                    value={experience.position}
+                    onChange={(value) =>
+                      updateList<WorkExperience>(
+                        "workExperiences",
+                        index,
+                        "position",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`입사일 ${index + 1}`}
+                    value={experience.startDate}
+                    onChange={(value) =>
+                      updateList<WorkExperience>(
+                        "workExperiences",
+                        index,
+                        "startDate",
+                        value,
+                      )
+                    }
+                  />
+                  <TextField
+                    label={`퇴사일 ${index + 1}`}
+                    value={experience.endDate}
+                    onChange={(value) =>
+                      updateList<WorkExperience>(
+                        "workExperiences",
+                        index,
+                        "endDate",
+                        value,
+                      )
+                    }
+                  />
                   <div className="md:col-span-2">
-                    <TextField label={`업무 내용 ${index + 1}`} value={experience.description} onChange={(value) => updateList<WorkExperience>("workExperiences", index, "description", value)} multiline />
+                    <TextField
+                      label={`업무 내용 ${index + 1}`}
+                      value={experience.description}
+                      onChange={(value) =>
+                        updateList<WorkExperience>(
+                          "workExperiences",
+                          index,
+                          "description",
+                          value,
+                        )
+                      }
+                      multiline
+                    />
                   </div>
                 </div>
               </div>
@@ -374,7 +801,10 @@ function OptionsApp() {
               onClick={() =>
                 setProfile((current) => ({
                   ...current,
-                  awards: [...current.awards, { name: "", awardDate: "", issuer: "", description: "" }]
+                  awards: [
+                    ...current.awards,
+                    { name: "", awardDate: "", issuer: "", description: "" },
+                  ],
                 }))
               }
             >
@@ -385,16 +815,23 @@ function OptionsApp() {
         >
           <div className="space-y-5">
             {profile.awards.map((award, index) => (
-              <div className="border-t border-[#d8ded2] pt-4 first:border-t-0 first:pt-0" key={index}>
+              <div
+                className="border-t border-[#d8ded2] pt-4 first:border-t-0 first:pt-0"
+                key={index}
+              >
                 <div className="mb-3 flex items-center justify-between">
-                  <p className="text-sm font-semibold">{award.name || "새 수상 항목"}</p>
+                  <p className="text-sm font-semibold">
+                    {award.name || "새 수상 항목"}
+                  </p>
                   <Button
                     aria-label="수상 항목 삭제"
                     variant="text"
                     onClick={() =>
                       setProfile((current) => ({
                         ...current,
-                        awards: current.awards.filter((_, itemIndex) => itemIndex !== index)
+                        awards: current.awards.filter(
+                          (_, itemIndex) => itemIndex !== index,
+                        ),
                       }))
                     }
                   >
@@ -403,10 +840,35 @@ function OptionsApp() {
                   </Button>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <TextField label={`수상명 ${index + 1}`} value={award.name} onChange={(value) => updateList<Award>("awards", index, "name", value)} />
-                  <TextField label={`수상일 ${index + 1}`} value={award.awardDate} onChange={(value) => updateList<Award>("awards", index, "awardDate", value)} />
-                  <TextField label={`수여기관 ${index + 1}`} value={award.issuer} onChange={(value) => updateList<Award>("awards", index, "issuer", value)} />
-                  <TextField label={`수상 내용 ${index + 1}`} value={award.description} onChange={(value) => updateList<Award>("awards", index, "description", value)} multiline />
+                  <TextField
+                    label={`수상명 ${index + 1}`}
+                    value={award.name}
+                    onChange={(value) =>
+                      updateList<Award>("awards", index, "name", value)
+                    }
+                  />
+                  <TextField
+                    label={`수상일 ${index + 1}`}
+                    value={award.awardDate}
+                    onChange={(value) =>
+                      updateList<Award>("awards", index, "awardDate", value)
+                    }
+                  />
+                  <TextField
+                    label={`수여기관 ${index + 1}`}
+                    value={award.issuer}
+                    onChange={(value) =>
+                      updateList<Award>("awards", index, "issuer", value)
+                    }
+                  />
+                  <TextField
+                    label={`수상 내용 ${index + 1}`}
+                    value={award.description}
+                    onChange={(value) =>
+                      updateList<Award>("awards", index, "description", value)
+                    }
+                    multiline
+                  />
                 </div>
               </div>
             ))}
@@ -426,7 +888,10 @@ function OptionsApp() {
             </div>
             {confirmReset ? (
               <div className="flex gap-2">
-                <Button variant="secondary" onClick={() => setConfirmReset(false)}>
+                <Button
+                  variant="secondary"
+                  onClick={() => setConfirmReset(false)}
+                >
                   취소
                 </Button>
                 <Button onClick={handleClear}>
@@ -450,5 +915,5 @@ function OptionsApp() {
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <OptionsApp />
-  </React.StrictMode>
+  </React.StrictMode>,
 );

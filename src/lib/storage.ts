@@ -3,9 +3,10 @@ import type {
   Award,
   Credential,
   Education,
+  LanguageScore,
   PersonalInfo,
   WorkExperience,
-  UserProfile
+  UserProfile,
 } from "../types/profile";
 
 const PROFILE_STORAGE_KEY = "applymate.profile";
@@ -16,7 +17,7 @@ function emptyPersonalInfo(): PersonalInfo {
     birthDate: "",
     email: "",
     phone: "",
-    address: ""
+    address: "",
   };
 }
 
@@ -36,7 +37,7 @@ function normalizePersonalInfo(value: unknown): PersonalInfo {
     birthDate: stringValue(record.birthDate),
     email: stringValue(record.email),
     phone: stringValue(record.phone),
-    address: stringValue(record.address)
+    address: stringValue(record.address),
   };
 }
 
@@ -49,7 +50,7 @@ function normalizeEducation(value: unknown): Education {
     degree: stringValue(record.degree),
     startDate: stringValue(record.startDate),
     endDate: stringValue(record.endDate),
-    gpa: stringValue(record.gpa)
+    gpa: stringValue(record.gpa),
   };
 }
 
@@ -59,7 +60,18 @@ function normalizeCredential(value: unknown): Credential {
   return {
     name: stringValue(record.name),
     acquiredDate: stringValue(record.acquiredDate),
-    issuer: stringValue(record.issuer)
+    issuer: stringValue(record.issuer),
+  };
+}
+
+function normalizeLanguageScore(value: unknown): LanguageScore {
+  const record = isRecord(value) ? value : {};
+
+  return {
+    language: stringValue(record.language),
+    testName: stringValue(record.testName),
+    score: stringValue(record.score),
+    acquiredDate: stringValue(record.acquiredDate),
   };
 }
 
@@ -68,11 +80,12 @@ function normalizeActivityProject(value: unknown): ActivityProject {
 
   return {
     title: stringValue(record.title),
+    organization: stringValue(record.organization),
     startDate: stringValue(record.startDate),
     endDate: stringValue(record.endDate),
     role: stringValue(record.role),
     description: stringValue(record.description),
-    techStack: stringValue(record.techStack)
+    techStack: stringValue(record.techStack),
   };
 }
 
@@ -84,7 +97,7 @@ function normalizeWorkExperience(value: unknown): WorkExperience {
     position: stringValue(record.position),
     startDate: stringValue(record.startDate),
     endDate: stringValue(record.endDate),
-    description: stringValue(record.description)
+    description: stringValue(record.description),
   };
 }
 
@@ -95,13 +108,13 @@ function normalizeAward(value: unknown): Award {
     name: stringValue(record.name),
     awardDate: stringValue(record.awardDate),
     issuer: stringValue(record.issuer),
-    description: stringValue(record.description)
+    description: stringValue(record.description),
   };
 }
 
 function normalizeArray<T>(
   value: unknown,
-  normalizeItem: (item: unknown) => T
+  normalizeItem: (item: unknown) => T,
 ): T[] {
   return Array.isArray(value) ? value.map(normalizeItem) : [];
 }
@@ -111,10 +124,11 @@ export function createEmptyProfile(): UserProfile {
     personal: emptyPersonalInfo(),
     educations: [],
     credentials: [],
+    languageScores: [],
     extracurricularProjects: [],
     workExperiences: [],
     awards: [],
-    updatedAt: null
+    updatedAt: null,
   };
 }
 
@@ -125,15 +139,25 @@ export function normalizeProfile(value: unknown): UserProfile {
 
   return {
     personal: normalizePersonalInfo(value.personal),
-    educations: normalizeArray(value.educations ?? value.education, normalizeEducation),
+    educations: normalizeArray(
+      value.educations ?? value.education,
+      normalizeEducation,
+    ),
     credentials: normalizeArray(value.credentials, normalizeCredential),
+    languageScores: normalizeArray(
+      value.languageScores,
+      normalizeLanguageScore,
+    ),
     extracurricularProjects: normalizeArray(
       value.extracurricularProjects ?? value.projects,
-      normalizeActivityProject
+      normalizeActivityProject,
     ),
-    workExperiences: normalizeArray(value.workExperiences, normalizeWorkExperience),
+    workExperiences: normalizeArray(
+      value.workExperiences,
+      normalizeWorkExperience,
+    ),
     awards: normalizeArray(value.awards, normalizeAward),
-    updatedAt: typeof value.updatedAt === "string" ? value.updatedAt : null
+    updatedAt: typeof value.updatedAt === "string" ? value.updatedAt : null,
   };
 }
 
@@ -142,9 +166,16 @@ export function isProfileEmpty(profile: UserProfile): boolean {
     ...Object.values(profile.personal),
     ...profile.educations.flatMap((education) => Object.values(education)),
     ...profile.credentials.flatMap((credential) => Object.values(credential)),
-    ...profile.extracurricularProjects.flatMap((project) => Object.values(project)),
-    ...profile.workExperiences.flatMap((workExperience) => Object.values(workExperience)),
-    ...profile.awards.flatMap((award) => Object.values(award))
+    ...profile.languageScores.flatMap((languageScore) =>
+      Object.values(languageScore),
+    ),
+    ...profile.extracurricularProjects.flatMap((project) =>
+      Object.values(project),
+    ),
+    ...profile.workExperiences.flatMap((workExperience) =>
+      Object.values(workExperience),
+    ),
+    ...profile.awards.flatMap((award) => Object.values(award)),
   ];
 
   return values.every((value) => value.trim() === "");
@@ -160,8 +191,8 @@ export async function saveProfile(profile: UserProfile): Promise<void> {
   await chrome.storage.local.set({
     [PROFILE_STORAGE_KEY]: {
       ...normalizedProfile,
-      updatedAt: new Date().toISOString()
-    }
+      updatedAt: new Date().toISOString(),
+    },
   });
 }
 

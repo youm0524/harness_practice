@@ -4,7 +4,7 @@ import {
   createEmptyProfile,
   getProfile,
   isProfileEmpty,
-  saveProfile
+  saveProfile,
 } from "./storage";
 
 const storage = new Map<string, unknown>();
@@ -19,13 +19,15 @@ beforeEach(() => {
       local: {
         get: vi.fn(async (key: string) => ({ [key]: storage.get(key) })),
         set: vi.fn(async (items: Record<string, unknown>) => {
-          Object.entries(items).forEach(([key, value]) => storage.set(key, value));
+          Object.entries(items).forEach(([key, value]) =>
+            storage.set(key, value),
+          );
         }),
         remove: vi.fn(async (key: string) => {
           storage.delete(key);
-        })
-      }
-    }
+        }),
+      },
+    },
   } as unknown as typeof chrome;
 });
 
@@ -37,14 +39,15 @@ describe("storage helpers", () => {
         birthDate: "",
         email: "",
         phone: "",
-        address: ""
+        address: "",
       },
       educations: [],
       credentials: [],
+      languageScores: [],
       extracurricularProjects: [],
       workExperiences: [],
       awards: [],
-      updatedAt: null
+      updatedAt: null,
     });
   });
 
@@ -65,14 +68,14 @@ describe("storage helpers", () => {
       degree: "학사",
       startDate: "2020-03",
       endDate: "2024-02",
-      gpa: "4.1"
+      gpa: "4.1",
     });
 
     await saveProfile(profile);
 
     expect(await getProfile()).toEqual({
       ...profile,
-      updatedAt: "2026-05-12T00:00:00.000Z"
+      updatedAt: "2026-05-12T00:00:00.000Z",
     });
   });
 
@@ -103,15 +106,36 @@ describe("storage helpers", () => {
           endDate: "",
           role: "개발",
           description: "",
-          techStack: "React"
-        }
-      ]
+          techStack: "React",
+        },
+      ],
     });
 
     expect((await getProfile()).extracurricularProjects[0]).toMatchObject({
       title: "교내 해커톤",
+      organization: "",
       role: "개발",
-      techStack: "React"
+      techStack: "React",
+    });
+  });
+
+  it("normalizes language scores", async () => {
+    storage.set("applymate.profile", {
+      languageScores: [
+        {
+          language: "영어",
+          testName: "TOEIC",
+          score: "900",
+          acquiredDate: "2024-01",
+        },
+      ],
+    });
+
+    expect((await getProfile()).languageScores[0]).toEqual({
+      language: "영어",
+      testName: "TOEIC",
+      score: "900",
+      acquiredDate: "2024-01",
     });
   });
 });

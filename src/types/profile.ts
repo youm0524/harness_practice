@@ -21,8 +21,16 @@ export interface Credential {
   issuer: string;
 }
 
+export interface LanguageScore {
+  language: string;
+  testName: string;
+  score: string;
+  acquiredDate: string;
+}
+
 export interface ActivityProject {
   title: string;
+  organization: string;
   startDate: string;
   endDate: string;
   role: string;
@@ -49,6 +57,7 @@ export interface UserProfile {
   personal: PersonalInfo;
   educations: Education[];
   credentials: Credential[];
+  languageScores: LanguageScore[];
   extracurricularProjects: ActivityProject[];
   workExperiences: WorkExperience[];
   awards: Award[];

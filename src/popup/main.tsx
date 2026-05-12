@@ -1,10 +1,24 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
-import { AlertTriangle, CheckCircle2, FileText, Loader2, Search, Settings } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  FileText,
+  Loader2,
+  Search,
+  Settings,
+} from "lucide-react";
 import { Button } from "../components/Button";
 import { getProfile, isProfileEmpty } from "../lib/storage";
-import type { AutofillAnalysis, AutofillResult, FieldMatch } from "../types/autofill";
-import type { AnalyzeAutofillResponse, RunAutofillResponse } from "../types/messages";
+import type {
+  AutofillAnalysis,
+  AutofillResult,
+  FieldMatch,
+} from "../types/autofill";
+import type {
+  AnalyzeAutofillResponse,
+  RunAutofillResponse,
+} from "../types/messages";
 import type { UserProfile } from "../types/profile";
 import "../styles.css";
 
@@ -44,7 +58,7 @@ function profileFieldLabel(field: string) {
     company: "회사명",
     position: "직무/직위",
     awardDate: "수상일",
-    description: "내용"
+    description: "내용",
   };
 
   if (field.startsWith("educations.")) {
@@ -85,7 +99,9 @@ function PopupApp() {
         setStatus(isProfileEmpty(storedProfile) ? "empty" : "ready");
       })
       .catch(() => {
-        setError("프로필을 읽을 수 없습니다. options 페이지에서 다시 저장하세요.");
+        setError(
+          "프로필을 읽을 수 없습니다. options 페이지에서 다시 저장하세요.",
+        );
         setStatus("error");
       });
   }, []);
@@ -103,11 +119,14 @@ function PopupApp() {
     try {
       const response = (await chrome.runtime.sendMessage({
         type: "ANALYZE_AUTOFILL",
-        profile
+        profile,
       })) as AnalyzeAutofillResponse;
 
       if (!response?.ok || !response.analysis) {
-        setError(response?.error ?? "페이지를 분석하지 못했습니다. 현재 탭을 확인하세요.");
+        setError(
+          response?.error ??
+            "페이지를 분석하지 못했습니다. 현재 탭을 확인하세요.",
+        );
         setStatus("error");
         return;
       }
@@ -115,14 +134,16 @@ function PopupApp() {
       const defaultSelected = new Set(
         response.analysis.plan.matches
           .filter((match) => !match.reviewRequired)
-          .map((match) => match.candidateKey)
+          .map((match) => match.candidateKey),
       );
 
       setAnalysis(response.analysis);
       setSelectedKeys(defaultSelected);
       setStatus("reviewing");
     } catch {
-      setError("현재 탭에 접근할 수 없습니다. 지원 페이지를 새로고침한 뒤 다시 시도하세요.");
+      setError(
+        "현재 탭에 접근할 수 없습니다. 지원 페이지를 새로고침한 뒤 다시 시도하세요.",
+      );
       setStatus("error");
     }
   }
@@ -132,7 +153,9 @@ function PopupApp() {
       return;
     }
 
-    const matches = analysis.plan.matches.filter((match) => selectedKeys.has(match.candidateKey));
+    const matches = analysis.plan.matches.filter((match) =>
+      selectedKeys.has(match.candidateKey),
+    );
     if (matches.length === 0) {
       setError("입력할 항목을 하나 이상 선택하세요.");
       setStatus("error");
@@ -147,7 +170,7 @@ function PopupApp() {
       const response = (await chrome.runtime.sendMessage({
         type: "APPLY_AUTOFILL",
         plan: { matches },
-        candidatesCount: analysis.candidatesCount
+        candidatesCount: analysis.candidatesCount,
       })) as RunAutofillResponse;
 
       if (!response?.ok || !response.result) {
@@ -159,7 +182,9 @@ function PopupApp() {
       setResult(response.result);
       setStatus("done");
     } catch {
-      setError("현재 탭에 접근할 수 없습니다. 지원 페이지를 새로고침한 뒤 다시 시도하세요.");
+      setError(
+        "현재 탭에 접근할 수 없습니다. 지원 페이지를 새로고침한 뒤 다시 시도하세요.",
+      );
       setStatus("error");
     }
   }
@@ -204,7 +229,11 @@ function PopupApp() {
           </>
         ) : (
           <>
-            <Button className="w-full" disabled={isBusy || status === "loading-profile"} onClick={analyzePage}>
+            <Button
+              className="w-full"
+              disabled={isBusy || status === "loading-profile"}
+              onClick={analyzePage}
+            >
               {status === "analyzing" ? (
                 <Loader2 aria-hidden="true" className="h-4 w-4" />
               ) : (
@@ -212,7 +241,11 @@ function PopupApp() {
               )}
               {status === "analyzing" ? "분석 중" : "현재 페이지 분석"}
             </Button>
-            <Button className="mt-2 w-full" variant="secondary" onClick={openOptions}>
+            <Button
+              className="mt-2 w-full"
+              variant="secondary"
+              onClick={openOptions}
+            >
               <Settings aria-hidden="true" className="h-4 w-4" />
               프로필 수정
             </Button>
@@ -222,16 +255,25 @@ function PopupApp() {
         {analysis && status !== "empty" ? (
           <div className="mt-4 rounded-md border border-[#d8ded2] bg-[#f8faf6] p-3">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-semibold text-[#18201a]">
-                추천 매핑 {analysis.plan.matches.length}개
-              </p>
+              <div>
+                <p className="text-sm font-semibold text-[#18201a]">
+                  추천 매핑 {analysis.plan.matches.length}개
+                </p>
+                <p className="mt-1 text-xs text-[#69736a]">
+                  {analysis.adapterName} ·{" "}
+                  {analysis.supportLevel === "high" ? "전용 지원" : "기본 지원"}
+                </p>
+              </div>
               <p className="text-xs text-[#69736a]">{selectedCount}개 선택</p>
             </div>
             {analysis.plan.matches.length > 0 ? (
               <>
                 <ul className="mt-3 max-h-64 space-y-2 overflow-y-auto pr-1">
                   {analysis.plan.matches.map((match) => (
-                    <li className="rounded-md border border-[#d8ded2] bg-white p-2" key={match.candidateKey}>
+                    <li
+                      className="rounded-md border border-[#d8ded2] bg-white p-2"
+                      key={match.candidateKey}
+                    >
                       <label className="flex items-start gap-2 text-xs text-[#374239]">
                         <input
                           className="mt-1 h-4 w-4 accent-[#2f7d4f]"
@@ -259,7 +301,11 @@ function PopupApp() {
                     </li>
                   ))}
                 </ul>
-                <Button className="mt-3 w-full" disabled={isBusy || selectedCount === 0} onClick={applySelected}>
+                <Button
+                  className="mt-3 w-full"
+                  disabled={isBusy || selectedCount === 0}
+                  onClick={applySelected}
+                >
                   {status === "applying" ? (
                     <Loader2 aria-hidden="true" className="h-4 w-4" />
                   ) : (
@@ -279,28 +325,41 @@ function PopupApp() {
         {result ? (
           <div className="mt-4 rounded-md border border-[#d8ded2] bg-[#eef2e8] p-3">
             <p className="flex items-center gap-2 text-sm font-semibold text-[#18201a]">
-              <CheckCircle2 aria-hidden="true" className="h-4 w-4 text-[#2f7d4f]" />
+              <CheckCircle2
+                aria-hidden="true"
+                className="h-4 w-4 text-[#2f7d4f]"
+              />
               {result.message}
             </p>
             <dl className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
               <div>
                 <dt className="text-[#69736a]">채움</dt>
-                <dd className="text-base font-semibold">{result.filledCount}</dd>
+                <dd className="text-base font-semibold">
+                  {result.filledCount}
+                </dd>
               </div>
               <div>
                 <dt className="text-[#69736a]">스킵</dt>
-                <dd className="text-base font-semibold">{result.skippedCount}</dd>
+                <dd className="text-base font-semibold">
+                  {result.skippedCount}
+                </dd>
               </div>
               <div>
                 <dt className="text-[#69736a]">실패</dt>
-                <dd className="text-base font-semibold">{result.failedCount}</dd>
+                <dd className="text-base font-semibold">
+                  {result.failedCount}
+                </dd>
               </div>
             </dl>
             {result.matches.length > 0 ? (
               <ul className="mt-3 space-y-1 text-xs text-[#374239]">
                 {result.matches.map((match) => (
-                  <li className="truncate" key={`${match.candidateKey}-${match.profileField}`}>
-                    {match.label || match.candidateKey} {"->"} {match.profileField}
+                  <li
+                    className="truncate"
+                    key={`${match.candidateKey}-${match.profileField}`}
+                  >
+                    {match.label || match.candidateKey} {"->"}{" "}
+                    {match.profileField}
                   </li>
                 ))}
               </ul>
@@ -314,7 +373,10 @@ function PopupApp() {
         {status === "error" ? (
           <div className="mt-4 rounded-md border border-[#b42318] bg-white p-3 text-sm text-[#b42318]">
             <p className="flex items-start gap-2">
-              <AlertTriangle aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />
+              <AlertTriangle
+                aria-hidden="true"
+                className="mt-0.5 h-4 w-4 shrink-0"
+              />
               <span>{error}</span>
             </p>
           </div>
@@ -327,5 +389,5 @@ function PopupApp() {
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <PopupApp />
-  </React.StrictMode>
+  </React.StrictMode>,
 );

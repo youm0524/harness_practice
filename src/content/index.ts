@@ -1,8 +1,9 @@
+import { getSiteAdapter } from "../adapters";
 import { buildAutofillPlan } from "../lib/fieldMatcher";
 import {
   applyAutofillPlan,
   collectFieldCandidates,
-  createAutofillResult
+  createAutofillResult,
 } from "../lib/domCandidates";
 import type { ExtensionMessage, ExtensionResponse } from "../types/messages";
 
@@ -10,7 +11,7 @@ chrome.runtime.onMessage.addListener(
   (
     message: ExtensionMessage,
     _sender: chrome.runtime.MessageSender,
-    sendResponse: (response: ExtensionResponse) => void
+    sendResponse: (response: ExtensionResponse) => void,
   ) => {
     if (
       message.type !== "ANALYZE_AUTOFILL" &&
@@ -23,14 +24,17 @@ chrome.runtime.onMessage.addListener(
     try {
       if (message.type === "ANALYZE_AUTOFILL") {
         const candidates = collectFieldCandidates();
-        const plan = buildAutofillPlan(candidates, message.profile);
+        const adapter = getSiteAdapter(window.location.href);
+        const plan = adapter.buildPlan(candidates, message.profile);
 
         sendResponse({
           ok: true,
           analysis: {
             candidatesCount: candidates.length,
-            plan
-          }
+            adapterName: adapter.name,
+            supportLevel: adapter.supportLevel,
+            plan,
+          },
         });
         return true;
       }
@@ -40,7 +44,13 @@ chrome.runtime.onMessage.addListener(
 
         sendResponse({
           ok: true,
-          result: createAutofillResult([], message.plan, filled, failed, message.candidatesCount)
+          result: createAutofillResult(
+            [],
+            message.plan,
+            filled,
+            failed,
+            message.candidatesCount,
+          ),
         });
         return true;
       }
@@ -51,15 +61,16 @@ chrome.runtime.onMessage.addListener(
 
       sendResponse({
         ok: true,
-        result: createAutofillResult(candidates, plan, filled, failed)
+        result: createAutofillResult(candidates, plan, filled, failed),
       });
     } catch {
       sendResponse({
         ok: false,
-        error: "현재 페이지를 스캔할 수 없습니다. 페이지를 새로고침한 뒤 다시 시도하세요."
+        error:
+          "현재 페이지를 스캔할 수 없습니다. 페이지를 새로고침한 뒤 다시 시도하세요.",
       });
     }
 
     return true;
-  }
+  },
 );

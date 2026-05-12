@@ -34,6 +34,8 @@ export type AutofillPlan = {
 
 export type AutofillAnalysis = {
   candidatesCount: number;
+  adapterName: string;
+  supportLevel: "high" | "basic";
   plan: AutofillPlan;
 };
 
