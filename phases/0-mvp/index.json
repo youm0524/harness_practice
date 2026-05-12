@@ -5,32 +5,46 @@
     {
       "step": 0,
       "name": "extension-setup",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-05-06T21:51:48+0900",
+      "completed_at": "2026-05-06T21:59:10+0900",
+      "summary": "Vite React MV3 extension scaffold와 빌드/린트/테스트 스크립트 및 lockfile 생성"
     },
     {
       "step": 1,
       "name": "profile-model",
-      "status": "pending"
+      "status": "completed",
+      "completed_at": "2026-05-12T12:00:16+0900",
+      "summary": "프로필 타입과 chrome.storage.local 기반 저장 helper 및 테스트 구현"
     },
     {
       "step": 2,
       "name": "field-matching",
-      "status": "pending"
+      "status": "completed",
+      "completed_at": "2026-05-12T12:00:16+0900",
+      "summary": "DOM 비의존 규칙 기반 fieldMatcher와 AutofillPlan 테스트 구현"
     },
     {
       "step": 3,
       "name": "profile-options-ui",
-      "status": "pending"
+      "status": "completed",
+      "completed_at": "2026-05-12T12:00:16+0900",
+      "summary": "프로필 CRUD options UI와 반복 입력 섹션 구현"
     },
     {
       "step": 4,
       "name": "autofill-runtime",
-      "status": "pending"
+      "status": "completed",
+      "completed_at": "2026-05-12T12:00:16+0900",
+      "summary": "RUN_AUTOFILL 메시지 기반 DOM 스캔/입력 runtime과 결과 반환 구현"
     },
     {
       "step": 5,
       "name": "popup-results-ui",
-      "status": "pending"
+      "status": "completed",
+      "completed_at": "2026-05-12T12:00:16+0900",
+      "summary": "자동 채우기 실행 popup UI와 결과/오류/빈 프로필 상태 구현"
     }
-  ]
+  ],
+  "created_at": "2026-05-06T21:29:18+0900"
 }
